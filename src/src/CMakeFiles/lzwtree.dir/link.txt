@@ -1,1 +1,0 @@
-/usr/bin/c++    -std=c++14 -Wall -lm -O3   CMakeFiles/lzwtree.dir/main.cpp.o CMakeFiles/lzwtree.dir/lzwtree.cpp.o  -o lzwtree -rdynamic -lboost_program_options 

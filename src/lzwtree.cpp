@@ -1,6 +1,6 @@
 /*
- * <one line to give the program's name and a brief idea of what it does.>
- * Copyright (C) 2016  <copyright holder> <email>
+ * lzwTree
+ * Copyright (C) 2016  Viktor Szilárd Simkó aqviktor@gmail.com
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,10 +19,23 @@
 
 #include "lzwtree.h"
 
-lzwTree::lzwTree() : m_depth{}, m_mean{}, m_numOfLeaves{0}, m_spread{0}
+lzwTree::lzwTree() : m_depth{}, m_mean{}, m_spread{}
 {
     m_root = std::make_shared<Node>('/');
     m_inserter = m_root;
+}
+
+lzwTree::lzwTree(lzwTree&& rhs)
+{
+    m_root = rhs.m_root;
+    rhs.m_root = nullptr;
+}
+
+lzwTree& lzwTree::operator=(lzwTree&& rhs)
+{
+    m_root = rhs.m_root;
+    rhs.m_root = nullptr;
+    return *this;
 }
 
 lzwTree& lzwTree::insert(std::string str)
@@ -94,24 +107,28 @@ void lzwTree::print(std::shared_ptr<Node> currentNode, size_t& depth)
 
 void lzwTree::calc()
 {
-    Asd asd;
-    calc(m_root, asd);
+    leafVec leaves;
+    calc(m_root, leaves);
+    
+    std::for_each(leaves.begin(), leaves.end(), [&](unsigned int depth){ m_mean += depth; });
+    
+    m_mean /= leaves.size();
 
-    m_mean /= m_numOfLeaves;
-
-    for (auto tmpAsd : asd)
+    for (auto leaf : leaves)
     {
-        m_spread += (tmpAsd - m_mean) * (tmpAsd - m_mean);
+        m_spread += (leaf - m_mean) * (leaf - m_mean);
     }
 
-    m_spread *= (1.0 / (m_numOfLeaves - 1));
+    m_spread *= (1.0 / (leaves.size() - 1));
     m_spread = std::sqrt(m_spread);
+    
+    m_depth = *(std::max_element(leaves.begin(), leaves.end()));
 
     std::cout << "mean = " << m_mean << "\tspread = " << m_spread 
               << "\tdepth = " << m_depth << std::endl;
 }
 
-void lzwTree::calc(std::shared_ptr<Node> currentNode, Asd& asd)
+void lzwTree::calc(std::shared_ptr<Node> currentNode, leafVec& leaves)
 {
     if (currentNode == nullptr) return;
 
@@ -119,16 +136,16 @@ void lzwTree::calc(std::shared_ptr<Node> currentNode, Asd& asd)
 
     if (!currentNode->left() && !currentNode->right())
     {
-        m_numOfLeaves++;
-        m_mean += --m_depth;
-        asd.push_back(m_depth);
+        //m_numOfLeaves++;
+        //m_mean += --m_depth;
+        leaves.push_back(--m_depth);
 
         return;
     }
 
-    calc(currentNode->right(), asd);
+    calc(currentNode->right(), leaves);
 
-    calc(currentNode->left(), asd);
+    calc(currentNode->left(), leaves);
 
     m_depth--;
 }

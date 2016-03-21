@@ -8,11 +8,20 @@
 class reader
 {
 public:
-    reader(lzwTree& tree) : tree{ tree }, comment{ false } { }
+    reader(lzwTree& tree, unsigned long size) : tree{ tree }, comment{ false }, counter{ }, checkpoint{ }, size{ size } 
+    { 
+
+    }
 
     void operator() (char ch)
     {
-        //std::cerr << "wtf meghívva" << comment << std::endl;
+
+        if (counter++ == checkpoint)
+        {
+            std::cerr << (checkpoint / (size / 10)) * 10 << "\% built." << std::endl;
+            checkpoint += size / 10;
+        }
+
         if (ch == '>')
         {
             comment = true;
@@ -48,6 +57,9 @@ public:
 private:
     lzwTree& tree;
     bool comment;
+    unsigned long counter;
+    unsigned long checkpoint;
+    unsigned long size;
 };
 
 int main(int argc, const char **argv)
@@ -77,27 +89,26 @@ int main(int argc, const char **argv)
     if (vm.count("in"))
     {
         inFile = vm["in"].as<std::string>();
-        std::cout << "Input file is: " << inFile << std::endl;
+        std::cerr << "Input file is: " << inFile << std::endl;
     }
     else
     {
-        std::cout << "Input file was not found." << std::endl;
+        std::cerr << "Input file was not found." << std::endl;
         return 0;
     }   
     
     std::ifstream inputStream(inFile, std::ios::binary);
 
-    if (inputStream.is_open()) std::cerr << "stream is open" << std::endl;
+    if (inputStream.is_open()) std::cerr << "Input stream is open." << std::endl;
     
     std::vector<char> buffer(std::istreambuf_iterator<char>{inputStream},
                              std::istreambuf_iterator<char>{});
 
-    std::cerr << "beolvasva" << buffer.size() << "byte" << std::endl;
+    std::cerr << buffer.size() << " bytes read." << std::endl;
     
     lzwTree tree;
     
-    std::for_each(buffer.begin(), buffer.end(), reader{tree});
-
+    std::for_each(buffer.begin(), buffer.end(), reader{tree, buffer.size()});
     
     //tree.insert("01111001001001000111");
     tree.calc();

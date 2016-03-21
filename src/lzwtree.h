@@ -1,6 +1,6 @@
 /*
- * <one line to give the program's name and a brief idea of what it does.>
- * Copyright (C) 2016  <copyright holder> <email>
+ * lzwTree
+ * Copyright (C) 2016  Viktor Szilárd Simkó aqviktor@gmail.com
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,21 +28,20 @@
 
 class lzwTree
 {
-    using Asd = std::vector<unsigned int>;
+    using leafVec = std::vector<unsigned int>;
 
 public:
     lzwTree();
+    lzwTree(const lzwTree&) = delete;
+    lzwTree& operator = (const lzwTree&) = delete;
+    lzwTree(lzwTree&& rhs);
+    lzwTree& operator = (lzwTree&& rhs);
     
     lzwTree& insert(std::string str);
-    
     void insert(char ch);
-
     void calc();
-    
     void print();
     
-    //~lzwTree();
-
 private:
     class Node
     {
@@ -70,9 +69,8 @@ private:
     unsigned int m_depth;
     double m_mean;
     double m_spread;
-    unsigned int m_numOfLeaves;
 
-    void calc(std::shared_ptr<Node> currentNode, Asd& asd);
+    void calc(std::shared_ptr<Node> currentNode, leafVec& leaves);
     void print(std::shared_ptr<Node> currentNode, size_t& depth);
 };
 
