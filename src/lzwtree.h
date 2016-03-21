@@ -24,11 +24,13 @@
 #include <iostream>
 #include <string>
 #include <cmath>
-#include <vector>
+#include <map>
 
 class lzwTree
 {
-    using leafVec = std::vector<unsigned int>;
+    class Node;
+    using leafPair = std::pair<std::shared_ptr<Node>, unsigned int>;
+    using leafMap = std::map<std::shared_ptr<Node>, unsigned int>;
 
 public:
     lzwTree();
@@ -43,35 +45,37 @@ public:
     void print();
     
 private:
-    class Node
-    {
-    public:
-        Node(char val) : m_val{ val }, m_left{ nullptr }, m_right{ nullptr }
-        { 
-        }
-        
-        char val() const { return m_val; }
-        
-        std::shared_ptr<Node> left() const { return m_left; }
-        std::shared_ptr<Node> right() const { return m_right; }
-        
-        void setLeft(std::shared_ptr<Node> left) { m_left = left; };
-        void setRight(std::shared_ptr<Node> right) { m_right = right;};
-    private:
-        char m_val;
-        std::shared_ptr<Node> m_left;
-        std::shared_ptr<Node> m_right;
-    };
     
     std::shared_ptr<Node> m_root;
     std::shared_ptr<Node> m_inserter;
+
+    leafMap m_leaves;
     
     unsigned int m_depth;
     double m_mean;
     double m_spread;
 
-    void calc(std::shared_ptr<Node> currentNode, leafVec& leaves);
     void print(std::shared_ptr<Node> currentNode, size_t& depth);
+};
+
+class lzwTree::Node
+{
+public:
+    Node(char val) : m_val{ val }, m_left{ nullptr }, m_right{ nullptr }
+    { 
+    }
+    
+    char val() const { return m_val; }
+    
+    std::shared_ptr<Node> left() const { return m_left; }
+    std::shared_ptr<Node> right() const { return m_right; }
+    
+    void setLeft(std::shared_ptr<Node> left) { m_left = left; };
+    void setRight(std::shared_ptr<Node> right) { m_right = right;};
+private:
+    char m_val;
+    std::shared_ptr<Node> m_left;
+    std::shared_ptr<Node> m_right;
 };
 
 #endif // LZWTREE_H

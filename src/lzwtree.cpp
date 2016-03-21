@@ -54,12 +54,23 @@ void lzwTree::insert(char ch)
         if (m_inserter->right())
         {
             m_inserter = m_inserter->right();
+            m_depth++;
         }
         else
         {
             std::shared_ptr<Node> tmp = std::make_shared<Node>('1');
             m_inserter->setRight(tmp);
+
+            auto it = m_leaves.find(m_inserter);
+            if (it != m_leaves.end())
+            {
+                m_leaves.erase(it);
+            }
+
+            m_leaves[m_inserter->right()] = m_depth + 1;
+
             m_inserter = m_root;
+            m_depth = 0;
         }
     }
     else 
@@ -67,12 +78,23 @@ void lzwTree::insert(char ch)
         if (m_inserter->left())
         {
             m_inserter = m_inserter->left();
+            m_depth++;
         }
         else
         {
             std::shared_ptr<Node> tmp = std::make_shared<Node>('0');
             m_inserter->setLeft(tmp);
+
+            auto it = m_leaves.find(m_inserter);
+            if (it != m_leaves.end())
+            {
+                m_leaves.erase(it);
+            }
+
+            m_leaves[m_inserter->left()] = m_depth + 1;
+
             m_inserter = m_root;
+            m_depth = 0;
         }
     }
 }
@@ -107,56 +129,22 @@ void lzwTree::print(std::shared_ptr<Node> currentNode, size_t& depth)
 
 void lzwTree::calc()
 {
-    leafVec leaves;
-    calc(m_root, leaves);
+    std::for_each(m_leaves.begin(), m_leaves.end(), [&](const leafPair& l){ m_mean += l.second; });
     
-    std::for_each(leaves.begin(), leaves.end(), [&](unsigned int depth){ m_mean += depth; });
-    
-    m_mean /= leaves.size();
+    m_mean /= m_leaves.size();
 
-    for (auto leaf : leaves)
+    for (auto leaf : m_leaves)
     {
-        m_spread += (leaf - m_mean) * (leaf - m_mean);
+        m_spread += (leaf.second - m_mean) * (leaf.second - m_mean);
     }
 
-    m_spread *= (1.0 / (leaves.size() - 1));
+    m_spread *= (1.0 / (m_leaves.size() - 1));
     m_spread = std::sqrt(m_spread);
     
-    m_depth = *(std::max_element(leaves.begin(), leaves.end()));
+    m_depth = std::max_element(m_leaves.begin(), m_leaves.end(), [](const leafPair& lhs, const leafPair& rhs){
+                    return lhs.second < rhs.second;
+                })->second;
 
     std::cout << "mean = " << m_mean << "\tspread = " << m_spread 
               << "\tdepth = " << m_depth << std::endl;
 }
-
-void lzwTree::calc(std::shared_ptr<Node> currentNode, leafVec& leaves)
-{
-    if (currentNode == nullptr) return;
-
-    m_depth++;
-
-    if (!currentNode->left() && !currentNode->right())
-    {
-        //m_numOfLeaves++;
-        //m_mean += --m_depth;
-        leaves.push_back(--m_depth);
-
-        return;
-    }
-
-    calc(currentNode->right(), leaves);
-
-    calc(currentNode->left(), leaves);
-
-    m_depth--;
-}
-
-/*
-lzwTree::~lzwTree()
-{
-
-}
-*/
-
-
-
-
