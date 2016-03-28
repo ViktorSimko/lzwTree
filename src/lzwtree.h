@@ -42,7 +42,7 @@ public:
     
     lzwTree& insert(std::string str);
     void insert(char ch);
-    void calc();
+    void printInfo();
     void print();
     
 private:

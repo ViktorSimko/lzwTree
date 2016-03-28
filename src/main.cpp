@@ -5,6 +5,12 @@
 #include <boost/program_options.hpp>
 #include "lzwtree.h"
 
+/* 
+ * This functor:
+ * -- splits the bytes from the input into bits
+ * -- inserts the bits into the tree as chars
+ * -- informs about the progress of building the tree
+ */
 class reader
 {
 public:
@@ -18,10 +24,12 @@ public:
 
         if (counter++ == checkpoint)
         {
+            // inform about the progress
             std::cerr << (checkpoint / (size / 10)) * 10 << "\% built." << std::endl;
             checkpoint += size / 10;
         }
 
+        // comments begin with '>'
         if (ch == '>')
         {
             comment = true;
@@ -41,9 +49,10 @@ public:
             return;
         }
 
+        // split the bytes into bits
         for (auto i = 0; i < 8; ++i)
         {
-            if ((ch << i) & 0x80)
+            if ((ch << i) & 0x80) // mask with 1000_0000 so we get the MSB
             {
                 tree.insert('1');
             }
@@ -55,11 +64,11 @@ public:
     }
     
 private:
-    lzwTree& tree;
-    bool comment;
-    unsigned long counter;
-    unsigned long checkpoint;
-    unsigned long size;
+    lzwTree& tree; // the tree into which we need to insert
+    bool comment; // true, if we are in a comment
+    unsigned long counter; // the number of bytes that are already processed
+    unsigned long checkpoint; // every tenth of the the size of the input is a checkpoint
+    unsigned long size; // the size of the input
 };
 
 int main(int argc, const char **argv)
@@ -111,8 +120,8 @@ int main(int argc, const char **argv)
     std::for_each(buffer.begin(), buffer.end(), reader{tree, buffer.size()});
     
     //tree.insert("01111001001001000111");
-    tree.calc();
-    //tree.print();
+    tree.printInfo();
+    tree.print();
     
     return 0;
 }

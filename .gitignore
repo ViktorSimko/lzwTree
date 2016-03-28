@@ -3,4 +3,5 @@ build_clang/
 build_gcc/
 genom.fa
 intest
+out.md
 *.kdev4

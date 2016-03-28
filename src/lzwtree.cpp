@@ -127,7 +127,7 @@ void lzwTree::print(std::shared_ptr<Node> currentNode, size_t& depth)
     depth--;
 }
 
-void lzwTree::calc()
+void lzwTree::printInfo()
 {
     std::for_each(m_leaves.begin(), m_leaves.end(), [&](const leafPair& l){ m_mean += l.second; });
     
