@@ -1,0 +1,14 @@
+#!/bin/bash
+
+export CC=clang
+export CXX=clang++
+
+export BOOST_ROOT=/home/viktor/Downloads/boost_1_58_0
+
+if ! [ -d build_clang ]; then
+    mkdir build_clang
+fi
+        
+cd build_clang
+
+cmake ..

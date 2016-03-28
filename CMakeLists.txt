@@ -4,6 +4,6 @@ project(lzwtree)
 
 find_package(Boost COMPONENTS program_options REQUIRED)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -lm -O3")
+set(CMAKE_CXX_FLAGS "-std=c++14 -o3")
 
 add_subdirectory(src)

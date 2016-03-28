@@ -21,6 +21,7 @@
 #define LZWTREE_H
 
 #include <memory>
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <cmath>
