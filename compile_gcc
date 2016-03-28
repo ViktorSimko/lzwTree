@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if ! [ -d build_gcc ]; then
+    mkdir build_gcc
+fi
+
+cd build_gcc
+
+cmake .. && make -j2
