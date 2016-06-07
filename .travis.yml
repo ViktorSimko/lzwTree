@@ -1,2 +1,2 @@
-script: compile_gcc
+script: ./compile_gcc
 compiler: gcc
