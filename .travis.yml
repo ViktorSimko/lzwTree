@@ -1,2 +1,7 @@
-script: ./compile_gcc
+language: c++
 compiler: gcc
+before_script:
+  - sudo apt-get update -qq
+  - sudo apt-get install libboost-dev
+script: ./compile_gcc
+
