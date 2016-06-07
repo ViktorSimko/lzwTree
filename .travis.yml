@@ -1,0 +1,2 @@
+script: compile_gcc
+compiler: gcc
